@@ -1,0 +1,13 @@
+FileVersion = 1
+Dependencies = {corlib = "*", SDL2 = "*"}
+
+[Project]
+Name = "BeefChip"
+StartupObject = "BeefChip.Program"
+
+[Configs.Debug.Win64]
+TargetDirectory = "$(WorkspaceDir)/dist"
+TargetName = "$(ProjectName)_d"
+
+[Configs.Release.Win64]
+TargetDirectory = "$(WorkspaceDir)/dist"

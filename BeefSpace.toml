@@ -1,0 +1,6 @@
+FileVersion = 1
+Projects = {BeefChip = {Path = "."}, SDL2 = "*"}
+Unlocked = ["SDL2", "corlib"]
+
+[Workspace]
+StartupProject = "BeefChip"
