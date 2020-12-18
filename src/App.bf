@@ -20,7 +20,7 @@ namespace BeefChip
 		public new void Init()
 		{
 			cpu = new CPU();
-			cpu.LoadROM("dist/ROM/test_opcode");
+			cpu.LoadROM("dist/ROM/BC_test");
 			base.Init();
 			mFont = new Font();
 			mFont.Load("zorque.ttf", 12);

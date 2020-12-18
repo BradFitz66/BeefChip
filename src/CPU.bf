@@ -29,8 +29,8 @@ namespace BeefChip
 
 		private uint16 pc;
 		public  uint16 opcode;
-		private uint16  I;
-		private uint8 sp;
+		private uint16 I;
+		private uint8  sp;
 
 		private uint8[16] V;
 		private uint16[16] Stack;
@@ -54,8 +54,8 @@ namespace BeefChip
 
 		public void emulateCycle()
 		{
-			opcode = uint8(int16(memory[pc]) << 8 | memory[pc + 1]);
-			Console.WriteLine((opcode & 0xF000)&0x000F);
+			opcode = (uint16(memory[pc]) << 8 | memory[pc + 1]);
+			Console.WriteLine((opcode & 0xF000));
 			switch (opcode & 0xF000)
 			{
 			case 0x0000:
@@ -81,13 +81,13 @@ namespace BeefChip
 				break;
 
 				case 0x1000: // 0x1NNN: Jumps to address NNN
-				pc = uint8(opcode & 0x0FFF);
+				pc = (opcode & 0x0FFF);
 				break;
 
 				case 0x2000: // 0x2NNN: Calls subroutine at NNN.
-				Stack[sp] = uint8(pc);			// Store current address in stack
+				Stack[sp] = (pc);			// Store current address in stack
 				++sp;					// Increment stack pointer
-				pc = uint8(opcode & 0x0FFF);	// Set the program counter to the address at NNN
+				pc = (opcode & 0x0FFF);	// Set the program counter to the address at NNN
 				break;
 
 				case 0x3000: // 0x3XNN: Skips the next instruction if VX equals NN
@@ -140,7 +140,7 @@ namespace BeefChip
 					break;
 
 					case 0x0003: // 0x8XY3: Sets VX to "VX XOR VY"
-						V[(opcode & 0x0F00) >> 8] = uint8(int8(V[(opcode & 0x0F00) >> 8]) ^ int8(V[(opcode & 0x00F0) >> 4]));
+						V[(opcode & 0x0F00) >> 8] = ((V[(opcode & 0x0F00) >> 8]) ^ (V[(opcode & 0x00F0) >> 4]));
 						pc += 2;
 					break;
 
@@ -149,7 +149,7 @@ namespace BeefChip
 							V[0xF] = 1; //carry
 						else 
 							V[0xF] = 0;					
-						V[(opcode & 0x0F00) >> 8] = uint8(int8(V[(opcode & 0x0F00) >> 8]) + int8(V[(opcode & 0x00F0) >> 4]));
+						V[(opcode & 0x0F00) >> 8] = ((V[(opcode & 0x0F00) >> 8]) + (V[(opcode & 0x00F0) >> 4]));
 						pc += 2;					
 					break;
 
@@ -158,12 +158,12 @@ namespace BeefChip
 							V[0xF] = 0; // there is a borrow
 						else 
 							V[0xF] = 1;					
-						V[(opcode & 0x0F00) >> 8] = uint8(V[(opcode & 0x0F00) >> 8] - V[(opcode & 0x00F0) >> 4]);
+						V[(opcode & 0x0F00) >> 8] = (V[(opcode & 0x0F00) >> 8] - V[(opcode & 0x00F0) >> 4]);
 						pc += 2;
 					break;
 
 					case 0x0006: // 0x8XY6: Shifts VX right by one. VF is set to the value of the least significant bit of VX before the shift
-						V[0xF] = V[(opcode & 0x0F00) >> 8] & (uint8)0x1;
+						V[0xF] = V[(opcode & 0x0F00) >> 8] & 0x1;
 						V[(opcode & 0x0F00) >> 8] >>= 1;
 						pc += 2;
 					break;
@@ -172,8 +172,8 @@ namespace BeefChip
 						if(V[(opcode & 0x0F00) >> 8] > V[(opcode & 0x00F0) >> 4])	// VY-VX
 							V[0xF] = 0; // there is a borrow
 						else
-							V[0xF] = uint8(1);
-						V[(opcode & 0x0F00) >> 8] = uint8(V[(opcode & 0x00F0) >> 4] - V[(opcode & 0x0F00) >> 8]);				
+							V[0xF] = (1);
+						V[(opcode & 0x0F00) >> 8] = (V[(opcode & 0x00F0) >> 4] - V[(opcode & 0x0F00) >> 8]);				
 						pc += 2;
 					break;
 
@@ -196,12 +196,12 @@ namespace BeefChip
 				break;
 
 				case 0xA000: // ANNN: Sets I to the address NNN
-				I = uint8(opcode & 0x0FFF);
+				I = (opcode & 0x0FFF);
 				pc += 2;
 				break;
 
 				case 0xB000: // BNNN: Jumps to the address NNN plus V0
-				pc = uint8((opcode & 0x0FFF) + V[0]);
+				pc = ((opcode & 0x0FFF) + V[0]);
 				break;
 
 				case 0xC000: // CXNN: Sets VX to a random number and NN
@@ -215,9 +215,9 @@ namespace BeefChip
 						 // VF is set to 1 if any screen pixels are flipped from set to unset when the sprite is drawn, 
 						 // and to 0 if that doesn't happen
 				{
-				uint8 x = uint8(V[(opcode & 0x0F00) >> 8]);
-				uint8 y = uint8(V[(opcode & 0x00F0) >> 4]);
-				uint8 height = uint8(opcode & 0x000F);
+				uint8 x = (V[(opcode & 0x0F00) >> 8]);
+				uint8 y = (V[(opcode & 0x00F0) >> 4]);
+				uint16 height = (opcode & 0x000F);
 				uint8 pixel;
 				
 				V[0xF] = 0;
@@ -232,7 +232,7 @@ namespace BeefChip
 							{
 								V[0xF] = 1;                                    
 							}
-							gfx[x + xline + ((y + yline) * 64)] = uint8((uint8)gfx[x + xline + ((y + yline) * 64)] ^ 1);
+							gfx[x + xline + ((y + yline) * 64)] = (gfx[x + xline + ((y + yline) * 64)] ^ 1);
 						}
 					}
 				}
@@ -318,9 +318,10 @@ namespace BeefChip
 					break;
 
 					case 0x0033: // FX33: Stores the Binary-coded decimal representation of VX at the addresses I, I plus 1, and I plus 2
-						memory[I]     = ((V[(opcode & 0x0F00) >> 8]) / 100);
-						memory[I + 1] = (((V[(opcode & 0x0F00) >> 8]) / 10) % 10);
-						memory[I + 2] = (((V[(opcode & 0x0F00) >> 8]) % 100) % 10);					
+						memory[I + 2] = V[(opcode & 0x0F00) >> 8] % 10;
+						memory[I + 1] = (V[(opcode & 0x0F00) >> 8] / 10) % 10;
+						memory[I] = (V[(opcode & 0x0F00) >> 8] / 100) % 10;
+				
 						pc += 2;
 					break;
 
@@ -329,7 +330,7 @@ namespace BeefChip
 							memory[I + i] = V[i];	
 
 						// On the original interpreter, when the operation is done, I = I + X + 1.
-						I += uint8((opcode & 0x0F00) >> 8) + 1;
+						I += ((opcode & 0x0F00) >> 8) + 1;
 						pc += 2;
 					break;
 
@@ -338,7 +339,7 @@ namespace BeefChip
 							V[i] = memory[I + i];			
 
 						// On the original interpreter, when the operation is done, I = I + X + 1.
-						I += uint8((opcode & 0x0F00) >> 8) + 1;
+						I += ((opcode & 0x0F00) >> 8) + 1;
 						pc += 2;
 					break;
 
